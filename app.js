@@ -7,6 +7,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+
+// Python-shell
+const {PythonShell} = require('python-shell');
+
+
 const swaggerUi = require('swagger-ui-express');
 
 var indexRouter = require('./routes/index');
@@ -15,9 +20,14 @@ const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 
+
+
 // fileupload module
 var fileupload = require('express-fileupload');
 app.use(fileupload());
+
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -64,6 +74,9 @@ database.once('connected', () => {
   console.log('Database Connected');
 });
 
+
+
+
 // Post method to upload a file to the server
 app.post('/upload', function(req, res, next) {
   if (!req.files || !req.files.photo) {
@@ -83,6 +96,26 @@ app.post('/upload', function(req, res, next) {
     });
   });
 });
+
+
+
+
+
+// Running python script 
+let options = {
+  scriptPath:"C:/Users/gokul/Desktop/location-extraction-api-main",
+  args: ["John",45],
+}
+
+PythonShell.run("salesman.py",options,(err,res) => {
+  if (err) console.log(err);
+  if (res) console.log(res);
+});
+
+
+
+
+
 
 // error handler
 app.use(function(err, req, res, next) {
