@@ -8,10 +8,6 @@ const cors = require('cors');
 require('dotenv').config();
 
 
-// Python-shell
-const {PythonShell} = require('python-shell');
-
-
 const swaggerUi = require('swagger-ui-express');
 
 var indexRouter = require('./routes/index');
@@ -19,15 +15,6 @@ var usersRouter = require('./routes/users');
 const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
-
-
-
-// fileupload module
-var fileupload = require('express-fileupload');
-app.use(fileupload());
-
-
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -74,51 +61,15 @@ database.once('connected', () => {
   console.log('Database Connected');
 });
 
-
-
-
-// Post method to upload a file to the server
-app.post('/upload', function(req, res, next) {
-  if (!req.files || !req.files.photo) {
-    return res.status(400).send('No file uploaded.');
-  }
-
-  const file = req.files.photo;
-  file.mv(path.join(__dirname, 'uploads', file.name), function(err) {
-    if (err) {
-      console.error(err);
-      return res.status(500).send('File upload failed.');
-    }
-
-    res.send({
-      success: true,
-      message: 'File uploaded!',
-    });
-  });
-});
-
-
-
-
-
-// Running python script 
-let options = {
-  scriptPath:"C:/Users/gokul/Desktop/location-extraction-api-main",
-  args: ["John",45],
-}
-
-PythonShell.run("salesman.py",options,(err,res) => {
-  if (err) console.log(err);
-  if (res) console.log(res);
-});
-
-
+// fileupload module
+var fileupload = require('express-fileupload');
+app.use(fileupload());
 
 
 
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 

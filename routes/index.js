@@ -1,13 +1,33 @@
 var express = require('express');
 var router = express.Router();
-
+var path = require('path');
+const { exec } = require('child_process');
 const { Coordinates } = require('../models/coordinates');
+
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
   res.render('index', { title: 'Location Extraction' });
 });
 
+
+// sample script running endpoint
+router.get('/sample-script-run', (req, res) => {
+  const scriptPath = path.join(__dirname, 'salesman.py')
+
+  const args = ["John", 45];
+
+  exec(`python3 ${scriptPath} ${args.join(' ')}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error executing Python script: ${error.message}`);
+      return res.status(500).send('An error occurred while executing the script.');
+    }
+
+    console.log('Python script output:', stdout);
+    res.status(200).send('Script executed successfully.');
+  });
+
+})
 
 /**
  * @swagger
@@ -160,10 +180,33 @@ router.get('/getdetails/:id', async (req, res, next) => {
     return res.status(200).send(coordinate);
   }
   catch (err) {
-    console.error(err);   
+    console.error(err);
     return res.status(500).send({ error: 'Server error' });
 
   }
 })
+
+
+// Post method to upload a file to the server
+// change the api endpoint to meaningfull
+router.post('/upload', function (req, res, next) {
+
+  if (!req.files || !req.files.photo) {
+    return res.status(400).send('No file uploaded.');
+  }
+
+  const file = req.files.photo;
+  file.mv(path.join(__dirname, 'uploads', file.name), function (err) {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('File upload failed.');
+    }
+
+    res.send({
+      success: true,
+      message: 'File uploaded!',
+    });
+  });
+});
 
 module.exports = router;
